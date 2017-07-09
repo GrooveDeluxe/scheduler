@@ -28,7 +28,7 @@ import UIKit
 let MAX_ALLOWED_NOTIFICATIONS = 64
 
 ///- author: Ahmed Abdul Badie
-class ABNScheduler {
+public class ABNScheduler {
     
     /// The maximum number of allowed UILocalNotification to be scheduled. Four slots
     /// are reserved if you would like to schedule notifications without them being queued.
@@ -49,7 +49,7 @@ class ABNScheduler {
     ///- returns: Notification's identifier if it was successfully scheduled, nil otherwise.
     /// To get an ABNotificaiton instance of this notification, use this identifier with
     /// `ABNScheduler.notificationWithIdentifier(_:)`.
-    class func schedule(alertBody: String, fireDate: Date) -> String? {
+    public class func schedule(alertBody: String, fireDate: Date) -> String? {
         let notification = ABNotification(alertBody: alertBody)
         if let identifier = notification.schedule(fireDate: fireDate) {
             return identifier
@@ -59,12 +59,12 @@ class ABNScheduler {
     
     ///Cancels the specified notification.
     ///- paramater: Notification to cancel.
-    class func cancel(_ notification: ABNotification) {
+    public class func cancel(_ notification: ABNotification) {
         notification.cancel()
     }
     
     ///Cancels all scheduled UILocalNotification and clears the ABNQueue.
-    class func cancelAllNotifications() {
+    public class func cancelAllNotifications() {
         UIApplication.shared.cancelAllLocalNotifications()
         ABNQueue.queue.clear()
         let _ = saveQueue()
@@ -72,7 +72,7 @@ class ABNScheduler {
     }
     
     ///- returns: ABNotification of the farthest UILocalNotification (last to be fired).
-    class func farthestLocalNotification() -> ABNotification? {
+    public class func farthestLocalNotification() -> ABNotification? {
         if let localNotification = UIApplication.shared.scheduledLocalNotifications?.last {
             return notificationWithUILocalNotification(localNotification)
         }
@@ -80,22 +80,22 @@ class ABNScheduler {
     }
     
     ///- returns: Count of scheduled UILocalNotification by iOS.
-    class func scheduledCount() -> Int {
+    public class func scheduledCount() -> Int {
         return (UIApplication.shared.scheduledLocalNotifications?.count)!
     }
     
     ///- returns: Count of queued ABNotification.
-    class func queuedCount() -> Int {
+    public class func queuedCount() -> Int {
         return ABNQueue.queue.count()
     }
     
     ///- returns: Count of scheduled UILocalNotification and queued ABNotification.
-    class func count() -> Int {
+    public class func count() -> Int {
         return scheduledCount() + queuedCount()
     }
     
     ///Schedules the maximum possible number of ABNotification from the ABNQueue
-    class func scheduleNotificationsFromQueue() {
+    public class func scheduleNotificationsFromQueue() {
         for _ in 0..<(min(maximumScheduledNotifications, MAX_ALLOWED_NOTIFICATIONS) - scheduledCount()) where ABNQueue.queue.count() > 0 {
             let notification = ABNQueue.queue.pop()
             let _ = notification.schedule(fireDate: notification.fireDate!)
@@ -106,7 +106,7 @@ class ABNScheduler {
     ///Creates an ABNotification from a UILocalNotification or from the ABNQueue.
     ///- parameter identifier: Identifier of the required notification.
     ///- returns: ABNotification if found, nil otherwise.
-    class func notificationWithIdentifier(_ identifier: String) -> ABNotification? {
+    public class func notificationWithIdentifier(_ identifier: String) -> ABNotification? {
         let notifs = UIApplication.shared.scheduledLocalNotifications
         let queue = ABNQueue.queue.notificationsQueue()
         if notifs?.count == 0 && queue.count == 0 {
@@ -130,14 +130,14 @@ class ABNScheduler {
     ///Instantiates an ABNotification from a UILocalNotification.
     ///- parameter localNotification: The UILocalNotification to instantiate an ABNotification from.
     ///- returns: The instantiated ABNotification from the UILocalNotification.
-    class func notificationWithUILocalNotification(_ localNotification: UILocalNotification) -> ABNotification {
+    public class func notificationWithUILocalNotification(_ localNotification: UILocalNotification) -> ABNotification {
         return ABNotification.notificationWithUILocalNotification(localNotification)
     }
     
     
     ///Reschedules all notifications by copying them into a temporary array,
     ///cancelling them, and scheduling them again.
-    class func rescheduleNotifications() {
+    public class func rescheduleNotifications() {
         let notificationsCount = count()
         var notificationsArray = [ABNotification?](repeating: nil, count: notificationsCount)
         
@@ -166,7 +166,7 @@ class ABNScheduler {
     
     ///Retrieves the total scheduled notifications (by iOS and in the notification queue) and returns them as ABNotification array.
     ///- returns: ABNotification array of scheduled notifications if any, nil otherwise.
-    class func scheduledNotifications() -> [ABNotification]? {
+    public class func scheduledNotifications() -> [ABNotification]? {
         if let localNotifications = UIApplication.shared.scheduledLocalNotifications {
             var notifications = [ABNotification]()
             
@@ -181,13 +181,13 @@ class ABNScheduler {
     }
     
     ///- returns: The notifications queue.
-    class func notificationsQueue() -> [ABNotification] {
+    public class func notificationsQueue() -> [ABNotification] {
         return ABNQueue.queue.notificationsQueue()
     }
     
     ///Persists the notifications queue to the disk
     ///> Call this method whenever you need to save changes done to the queue and/or before terminating the app.
-    class func saveQueue() -> Bool {
+    public class func saveQueue() -> Bool {
         return ABNQueue.queue.save()
     }
     
@@ -196,7 +196,7 @@ class ABNScheduler {
     /// Use this method for development and testing.
     ///> Prints all scheduled and queued notifications.
     ///> You can freely modifiy it without worrying about affecting any functionality.
-    class func listScheduledNotifications() {
+    public class func listScheduledNotifications() {
         let notifs = UIApplication.shared.scheduledLocalNotifications
         let notificationQueue = ABNQueue.queue.notificationsQueue()
         
@@ -227,7 +227,7 @@ class ABNScheduler {
     /// Used only for testing.
     /// - important: This method is only used to test that loading the queue is successful. Do not use it in production. The `ABNQueue().load()` method is called automatically when initially accessing the notification queue.
     /// - returns: Array of notifications read from disk.
-    class func loadQueue() -> [ABNotification]? {
+    public class func loadQueue() -> [ABNotification]? {
         return ABNQueue().load()
     }
 }
@@ -342,7 +342,7 @@ enum Repeats: String {
 
 ///A wrapper class around UILocalNotification.
 ///- author: Ahmed Abdul Badie
-open class ABNotification : NSObject, NSCoding, Comparable {
+public class ABNotification : NSObject, NSCoding, Comparable {
     fileprivate var localNotification: UILocalNotification
     var alertBody: String
     var alertAction: String?
@@ -357,7 +357,7 @@ open class ABNotification : NSObject, NSCoding, Comparable {
         return localNotification.fireDate
     }
     
-    init(alertBody: String) {
+    public init(alertBody: String) {
         self.alertBody = alertBody
         self.localNotification = UILocalNotification()
         self.identifier = UUID().uuidString
@@ -366,7 +366,7 @@ open class ABNotification : NSObject, NSCoding, Comparable {
         super.init()
     }
     
-    init(alertBody: String, identifier: String) {
+    public init(alertBody: String, identifier: String) {
         self.alertBody = alertBody
         self.localNotification = UILocalNotification()
         self.identifier = identifier
@@ -376,7 +376,7 @@ open class ABNotification : NSObject, NSCoding, Comparable {
     }
     
     ///Used to instantiate an ABNotification when loaded from disk.
-    fileprivate init(notification: UILocalNotification, alertBody: String, alertAction: String?, soundName: String?, identifier: String, repeats: Repeats, userInfo: Dictionary<String, AnyObject>, category: String?, scheduled: Bool) {
+    init(notification: UILocalNotification, alertBody: String, alertAction: String?, soundName: String?, identifier: String, repeats: Repeats, userInfo: Dictionary<String, AnyObject>, category: String?, scheduled: Bool) {
         self.alertBody = alertBody
         self.alertAction = alertAction
         self.soundName = soundName;
@@ -394,7 +394,7 @@ open class ABNotification : NSObject, NSCoding, Comparable {
     ///> Checks to see if there is enough room for the notification to be scheduled. Otherwise, the notification is queued.
     ///- parameter fireDate: The date in which the notification will be fired at.
     ///- returns: The identifier of the notification. Use this identifier to retrieve the notification using `ABNQueue.notificationWithIdentifier` and `ABNScheduler.notificationWithIdentifier` methods.
-    func schedule(fireDate date: Date) -> String? {
+    public func schedule(fireDate date: Date) -> String? {
         if self.scheduled {
             return nil
         } else {
@@ -442,13 +442,13 @@ open class ABNotification : NSObject, NSCoding, Comparable {
     
     ///Reschedules the notification.
     ///- parameter fireDate: The date in which the notification will be fired at.
-    func reschedule(fireDate date: Date) {
+    public func reschedule(fireDate date: Date) {
         cancel()
         let _ = schedule(fireDate: date)
     }
     
     ///Cancels the notification if scheduled or queued.
-    func cancel() {
+    public func cancel() {
         UIApplication.shared.cancelLocalNotification(self.localNotification)
         let queue = ABNQueue.queue.notificationsQueue()
         var i = 0
@@ -464,24 +464,24 @@ open class ABNotification : NSObject, NSCoding, Comparable {
     
     ///Snoozes the notification for a number of minutes.
     ///- parameter minutes: Minutes to snooze the notification for.
-    func snoozeForMinutes(_ minutes: Int) {
+    public func snoozeForMinutes(_ minutes: Int) {
         reschedule(fireDate: self.localNotification.fireDate!.nextMinutes(minutes))
     }
     
     ///Snoozes the notification for a number of hours.
     ///- parameter minutes: Hours to snooze the notification for.
-    func snoozeForHours(_ hours: Int) {
+    public func snoozeForHours(_ hours: Int) {
         reschedule(fireDate: self.localNotification.fireDate!.nextHours(hours))
     }
     
     ///Snoozes the notification for a number of days.
     ///- parameter minutes: Days to snooze the notification for.
-    func snoozeForDays(_ days: Int) {
+    public func snoozeForDays(_ days: Int) {
         reschedule(fireDate: self.localNotification.fireDate!.nextDays(days))
     }
     
     ///- returns: The state of the notification.
-    func isScheduled() -> Bool {
+    public func isScheduled() -> Bool {
         return self.scheduled
     }
     
