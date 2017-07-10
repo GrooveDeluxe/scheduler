@@ -336,7 +336,7 @@ private class ABNQueue : NSObject {
 
 //MARK:-
 ///- author: Ahmed Abdul Badie
-enum Repeats: String {
+public enum Repeats: String {
     case None, Hourly, Daily, Weekly, Monthly, Yearly
 }
 
@@ -347,13 +347,13 @@ public class ABNotification : NSObject, NSCoding, Comparable {
     var alertBody: String
     var alertAction: String?
     var soundName: String?
-    var repeatInterval = Repeats.None
+    public var repeatInterval = Repeats.None
     var userInfo: Dictionary<String, AnyObject>
     var badge = UIApplication.shared.applicationIconBadgeNumber
-    var category: String?
+    public var category: String?
     fileprivate(set) var identifier: String
     fileprivate var scheduled = false
-    var fireDate: Date? {
+    public var fireDate: Date? {
         return localNotification.fireDate
     }
     
